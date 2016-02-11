@@ -32,8 +32,6 @@ namespace Atlas
 
     public class ParallelYield : IEnumerator
     {
-        public object Current { get { return null; } }
-
         List<IEnumerator> _coroutines;
 
         public ParallelYield(params IEnumerator[] coroutines)
@@ -41,6 +39,7 @@ namespace Atlas
             _coroutines = new List<IEnumerator>(coroutines);
         }
 
+        public object Current { get { return null; } }
 
         public bool MoveNext()
         {
@@ -71,16 +70,11 @@ namespace Atlas
             return true;
         }
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
+        public void Reset() { }
     }
 
     public class SerialYield : IEnumerator
     {
-        public object Current { get { return _current; } }
-
         Queue<IEnumerator> _coroutines;
         IEnumerator _current;
 
@@ -89,6 +83,8 @@ namespace Atlas
             _coroutines = new Queue<IEnumerator>(coroutines);
             _current = _coroutines.Dequeue();
         }
+
+        public object Current { get { return _current; } }
 
         public bool MoveNext()
         {
@@ -118,18 +114,15 @@ namespace Atlas
             return true;
         }
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
+        public void Reset() { }
     }
 
     public class WaitForSecondsYield : IEnumerator
     {
-        public object Current { get { return null; } }
-
         float seconds;
         float startTime;
+
+        public object Current { get { return null; } }
 
         public WaitForSecondsYield(float seconds)
         {
@@ -137,37 +130,22 @@ namespace Atlas
             startTime = Time.realtimeSinceStartup;
         }
 
-        public bool MoveNext()
-        {
-            return Time.realtimeSinceStartup - startTime <= seconds;
-        }
+        public bool MoveNext() { return Time.realtimeSinceStartup - startTime <= seconds; }
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
+        public void Reset() { }
     }
 
     public class WWWYeild : IEnumerator
     {
         WWW _www;
 
-        public WWWYeild(WWW www)
-        {
-            _www = www;
-        }
+        public WWWYeild(WWW www) { _www = www; }
 
-        public object Current {  get { return null; } }
+        public object Current { get { return null; } }
 
-        public bool MoveNext()
-        {
-            return !_www.isDone;
-        }
+        public bool MoveNext() { return !_www.isDone; }
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
+        public void Reset() { }
     }
 
     class WaitWhile : IEnumerator
