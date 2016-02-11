@@ -84,7 +84,7 @@ namespace Atlas
             _current = _coroutines.Dequeue();
         }
 
-        public object Current { get { return _current; } }
+        public object Current { get { return null; } }
 
         public bool MoveNext()
         {
