@@ -148,11 +148,11 @@ namespace Atlas
         public void Reset() { }
     }
 
-    class WaitWhile : IEnumerator
+    class WaitWhileYield : IEnumerator
     {
         Func<bool> _predicate;
 
-        public WaitWhile(Func<bool> predicate) { _predicate = predicate; }
+        public WaitWhileYield(Func<bool> predicate) { _predicate = predicate; }
 
         public object Current { get { return null; } }
 
@@ -161,17 +161,68 @@ namespace Atlas
         public void Reset() { }
     }
 
-    class WaitUntil : IEnumerator
+    class WaitUntilYield : IEnumerator
     {
         Func<bool> _predicate;
 
-        public WaitUntil(Func<bool> predicate) { _predicate = predicate; }
+        public WaitUntilYield(Func<bool> predicate) { _predicate = predicate; }
 
         public object Current { get { return null; } }
 
         public bool MoveNext() { return !_predicate(); }
 
         public void Reset() { }
+    }
+
+    class WaitForFixedUpdateYield : IEnumerator
+    {
+        protected bool _keepblocking = true;
+
+        public object Current { get { return null; } }
+
+        public bool MoveNext() { return _keepblocking; }
+
+        public void Reset() { }
+
+        public WaitForFixedUpdateYield() { WaitForFixedUpdateYeildController.Instance.RegisterForFixedUpdate(this); }
+
+
+        class WaitForFixedUpdateYeildController : MonoBehaviour
+        {
+            static WaitForFixedUpdateYeildController _instance = null;
+            List<WaitForFixedUpdateYield> _yeilders = new List<WaitForFixedUpdateYield>();
+
+            public static WaitForFixedUpdateYeildController Instance
+            {
+                get
+                {
+                    if (_instance == null)
+                    {
+                        GameObject go = new GameObject("__WaitForFixedUpdate");
+                        _instance = go.AddComponent<WaitForFixedUpdateYeildController>();
+                    }
+                    return _instance;
+                }
+            }
+
+            void Awake()
+            {
+                DontDestroyOnLoad(this);
+            }
+
+            void FixedUpdate()
+            {
+                for (var i = 0; i < _yeilders.Count; ++i)
+                    _yeilders[i]._keepblocking = false;
+
+                _yeilders.Clear();
+            }
+
+            public void RegisterForFixedUpdate(WaitForFixedUpdateYield yieldObj)
+            {
+                _yeilders.Add(yieldObj);
+            }
+        }
     }
 }
 
